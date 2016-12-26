@@ -43,17 +43,19 @@ class node:
     def foreward_propagate(self,rectification_function_name,rectification_function):
     
         '''ARGUMENT 1: Give rectification name if its inbuilt else give 'NEW' as argument.
-           ARGUMENT 2: Give new rectification function handle "using lambda" or if inbuilt give 'NONE'. '''
+           ARGUMENT 2: Give new rectification function handle "using lambda" or if inbuilt give 'NONE'. 
            
         sigmoid=lambda x: 1/(1-math.exp(x)
         available_function=('sigmoid')
         if rectification_function_name in available_function:
             self.a_val=rectification_function_name(self.a_val)
         else:
-            self.a_val=rectification_function(self.z_val)
+            self.a_val=rectification_function(self.z_val)'''
     
+          
+        
     #Finding Gradient
-    #def find_gradient(self,just_foreward_layer)
+    def find_gradient(self,just_foreward_layer):
     
         ''' Finding Gradient for all the theta which is going out of this node 
             ARGUMENT 1: We take the '''
