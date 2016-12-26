@@ -2,10 +2,10 @@ import numpy as np
 import math
 class node:
     #ATTRIBUTES
-          
+    connection_type=()      
     # Array of Attributes
-    Theta=np.zeros((1,1),'float')
-    gradient=np.zeros((1,1),'float')
+    Theta=()                # It will be tuple of arrays (where arrays will hold theta theta for a particular subunits)
+    gradient=()
     
     #METHODS
     
