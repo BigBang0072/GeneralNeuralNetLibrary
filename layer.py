@@ -15,9 +15,9 @@ class layer():
         for i,unit_property in enumerate(unit_property_list):
             self.bias_property=self.bias_property+(unit_property[2],)
             if unit_property[2]=='un_biased':
-                self.sub_units=self.sub_units+(np.empty((unit_property[0],unit_property[1]),dtype=object))
+                self.sub_units=self.sub_units+(np.empty((unit_property[0],unit_property[1]),dtype=object),)
             elif unit_property[2]=='biased':
-                self.sub_units=self.sub_units+(np.empty((unit_property[0],unit_property[1]),dtype=object))
+                self.sub_units=self.sub_units+(np.empty((unit_property[0],unit_property[1]),dtype=object),)
             else:
                 print "Wrong Argument Input"
                 
@@ -33,7 +33,12 @@ class layer():
             
     
     def create_connection(self,foreward_layer,connection_list):
-    
+        ''' Argument 1: Give the foreward layer object to which we want to connection_list
+            Argument 2: its a list of tuple of connection from each subunits in this layer to all the subunits in foreward layer
+            Possible connection now are ('one_one','one_to_all','none') {subunit to subunit connection}
+            'one_one' : creates one to one mapping from current subunit to the specified subunit in next layer
+            'one_to_all : creates mapping where this all the nodes of this subunit are mapped to all the nodes of next layer subunit.
+            Later 'convolution' will be added. '''
         
         # Error Checking in argument
         if len(connection_list) != self.num_of_units:
@@ -44,6 +49,7 @@ class layer():
         
         #iteration over sub_units of current layer
         for i,unit_connection_tup in enumerate(connection_list):
+            #print unit_connection_tup
             # Error check for given tuple
             if len(unit_connection_tup) != foreward_layer.num_of_units :
                 print ('Error.Give correct number of connection for each subunits of next layer')
@@ -53,15 +59,19 @@ class layer():
                 shape=foreward_layer.sub_units[j].shape
                 if unit_connection=='one_one':
                     theta_temp=np.random.rand(1,1)
+                    #print theta_temp
                     #ErrorCheck
                     if foreward_layer.sub_units[j].shape != self.sub_units[i].shape:
                         print ("One to one corespondance is not possible")
                 elif unit_connection=='one_to_all':
                     theta_temp=np.random.rand(shape[0],shape[1])
-                unit_shape=self.sub_units[j].shape
+                    #print theta_temp
+                unit_shape=self.sub_units[i].shape
+                #print unit_shape
                 for k in range(unit_shape[0]):
                     for l in range(unit_shape[1]):
-                        self.sub_units[i][k][l].theta=self.i[k][l].theta+(theta_temp,)
+                        #print 'Hi K'
+                        self.sub_units[i][k][l].Theta=self.sub_units[i][k][l].Theta+(theta_temp,)
                         self.sub_units[i][k][l].connection_type=self.sub_units[i][k][l].connection_type+(unit_connection,)
                 
             
