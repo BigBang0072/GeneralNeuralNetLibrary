@@ -5,7 +5,7 @@ class node:
     connection_type=()      
     # Array of Attributes
     Theta=()                # It will be tuple of arrays (where arrays will hold theta theta for a particular subunits)
-    gradient=()
+    Gradient=()
     
     #METHODS
     
@@ -20,9 +20,9 @@ class node:
             if which_node=='input':
                 # I think we should keep it as arrays for multiple input examples handling at same time for the  batch 
                 if biased_flag=='un_biased':
-                    self.X=0
+                    self.a_val=0            # Here a_val will mean X_value
                 elif biased_flag=='biased':
-                    self.X=1
+                    self.a_val=1
             elif which_node=='output':
                 self.z_val=0
                 self.h_val=0
