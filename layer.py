@@ -74,6 +74,7 @@ class layer():
                 for k in range(unit_shape[0]):
                     for l in range(unit_shape[1]):
                         #print 'Hi K'
+                        theta_temp=theta_temp*np.random.rand()
                         self.sub_units[i][k][l].Theta=self.sub_units[i][k][l].Theta+(theta_temp,)
                         self.sub_units[i][k][l].Gradient=self.sub_units[i][k][l].Gradient+(gradient_temp,)
                         self.sub_units[i][k][l].connection_type=self.sub_units[i][k][l].connection_type+(unit_connection,)
@@ -97,8 +98,8 @@ class layer():
                         for l in range(shape_unit_current[1]):
                             for m in range(shape_unit_foreward[0]):
                                 for n in range(shape_unit_foreward[1]):
-                                    foreward_layer.sub_units[j][m][n]=foreward_layer.sub_units[j][m][n]+(self.sub_units[i][k][l].a_val*self.sub_units[i][k][l].Theta[j].item(m,n))
-            
+                                    foreward_layer.sub_units[j][m][n].z_val=foreward_layer.sub_units[j][m][n].z_val+(self.sub_units[i][k][l].a_val*self.sub_units[i][k][l].Theta[j].item(m,n))
+                                    
             
                     
             
