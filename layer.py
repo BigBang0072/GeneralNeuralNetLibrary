@@ -12,6 +12,8 @@ class layer():
         self.bias_property=()
         self.sub_units=()
         self.connections=()
+        sigmoid=lambda x:1/(1-math.exp(x))
+        self.rectification_function_tup=(sigmoid,)              # Add as many rectification function as necessary in the tuple.
         #print "HI"
         for i,unit_property in enumerate(unit_property_list):
             self.bias_property=self.bias_property+(unit_property[2],)
@@ -100,6 +102,15 @@ class layer():
                                 for n in range(shape_unit_foreward[1]):
                                     foreward_layer.sub_units[j][m][n].z_val=foreward_layer.sub_units[j][m][n].z_val+(self.sub_units[i][k][l].a_val*self.sub_units[i][k][l].Theta[j].item(m,n))
                                     
-            
-                    
+    
+    # ONLY FOR HIDDEN layer and OUTPUT layer. Rectifying the z_val to convert to a_val.
+    def inlayer_foreward_propagation(self):
+        if self.layer_type=='hidden' or self.layer_type=='output':
+            for i,sub_unit in enumerate(self.sub_units):
+                shape=sub_unit.shape
+                for j in range(shape[0]):
+                    for k in range(shape[1]):
+                        sub_unit[j][k].a_val=self.rectification_function_tup[0](sub_unit[j][k].z_val)
+        else:
+            print ("inlayer activation not valid for input layer")
             
