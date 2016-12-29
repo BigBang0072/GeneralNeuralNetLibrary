@@ -12,8 +12,10 @@ class layer():
         self.bias_property=()
         self.sub_units=()
         self.connections=()
-        sigmoid=lambda x:1/(1-math.exp(x))
+        sigmoid=lambda x:1/(1+math.exp(-x))
+        sigmoid_gradient= lambda x:sigmoid(x)*(1-sigmoid(x))
         self.rectification_function_tup=(sigmoid,)              # Add as many rectification function as necessary in the tuple.
+        self.rectification_gradient_tup=(sigmoid_gradient,)
         #print "HI"
         for i,unit_property in enumerate(unit_property_list):
             self.bias_property=self.bias_property+(unit_property[2],)
@@ -113,4 +115,68 @@ class layer():
                         sub_unit[j][k].a_val=self.rectification_function_tup[0](sub_unit[j][k].z_val)
         else:
             print ("inlayer activation not valid for input layer")
+            
+    # For our good old cost function J of classification problem. For other cost function write your own error_delta. on the output nodes.       
+    def layer_back_propagate(self,foreward_layer):
+        ''' Argument 1: is the foreward_layer from which we want error to be back-propagated, to find gradient of theta in this current layer.
+                        In case of output layer instead of foreward layer just give none as input.
+            BEWARE: We have to use it wisely by sequentially back-propagating from the last layer to hte first layer.
+                    For our good old cost function J of classification problem. For other cost function write your own error_delta. on the output nodes.'''
+        if self.layer_type=='output':
+            for i,sub_unit in enumerate(self.sub_units):
+                shape=sub_unit.shape
+                for j in range(shape[0]):
+                    for k in range(shape[1]):
+                        # Gradient of J(cost function: our standard).For other cost function write your own error_delta. on the output nodes. 
+                        sub_unit[j][k].error_delta=sub_unit[j][k].a_val-sub_unit[j][k].Y
+        elif self.layer_type=='hidden':
+            for i,sub_unit_current in enumerate(self.sub_units):
+                unit_connection_tup=self.connections[i]
+                for j,sub_unit_foreward in enumerate(foreward_layer.sub_units):
+                    unit_connection=unit_connection_tup[j]
+                    shape_unit_current=sub_unit_current.shape
+                    shape_unit_foreward=sub_unit_foreward.shape
+                    if unit_connection=='one_one':
+                        for k in range(shape_unit_current[0]):
+                            for l in range(shape_unit_current[1]):
+                                self.sub_units[i][k][l].Gradient[j][0][0]=foreward_layer.sub_units[j][k][l].error_delta*self.sub_units[i][k][l].a_val
+                                self.sub_units[i][k][l].error_delta=self.sub_units[i][k][l].error_delta+(foreward_layer.sub_units[j][k][l].error_delta*self.sub_units[i][k][l].Theta[j][0][0].item(0))
+                    elif unit_connection=='one_to_all':
+                        for k in range(shape_unit_current[0]):
+                            for l in range(shape_unit_current[1]):
+                                for m in range(shape_unit_foreward[0]):
+                                    for n in range(shape_unit_foreward[1]):
+                                        self.sub_units[i][k][l].Gradient[j][m][n]=foreward_layer.sub_unit[j][m][n].error_delta*self.sub_units[i][k][l].a_val
+                                        self.sub_units[i][k][l].error_delta=self.sub_units[i][k][l].error_delta+foreward_layer.sub_units[j][m][n].error_delta*self.sub_units[i][k][l].Theta[j].item(m,n)
+                        
+        elif self.layer_type=='input':
+            for i,sub_unit_current in enumerate(self.sub_units):
+                unit_connection_tup=self.connections[i]
+                for j,sub_unit_foreward in enumerate(foreward_layer.sub_units):
+                    unit_connection=unit_connection_tup[j]
+                    shape_unit_current=sub_unit_current.shape
+                    shape_unit_foreward=sub_unit_foreward.shape
+                    if unit_connection=='one_one':
+                        for k in range(shape_unit_current[0]):
+                            for l in range(shape_unit_current[1]):
+                                self.sub_units[i][k][l].Gradient[j][0][0]=foreward_layer.sub_units[j][k][l].error_delta*self.sub_units[i][k][l].a_val
+                                #self.sub_units[i][k][l].error_delta=self.sub_units[i][k][l].error_delta+(foreward_layer.sub_units[j][k][l].error_delta*self.sub_units[i][k][l].Theta[j][0][0].item(0))
+                    elif unit_connection=='one_to_all':
+                        for k in range(shape_unit_current[0]):
+                            for l in range(shape_unit_current[1]):
+                                for m in range(shape_unit_foreward[0]):
+                                    for n in range(shape_unit_foreward[1]):
+                                        self.sub_units[i][k][l].Gradient[j][m][n]=foreward_layer.sub_unit[j][m][n].error_delta*self.sub_units[i][k][l].a_val
+                                        #self.sub_units[i][k][l].error_delta=self.sub_units[i][k][l].error_delta+foreward_layer.sub_units[j][m][n].error_delta*self.sub_units[i][k][l].Theta[j].item(m,n)
+    
+        
+    def inlayer_back_propagate(self):
+        ''' To get the error delta with sigmoid gradient applied which was left in layer_back_propagate'''
+        for i,sub_unit in enumerate(self.sub_units):
+            shape=sub_unit.shape
+            for j in range(shape[0]):
+                for k in range(shape[1]):
+                    sub_unit[j][k].error_delta=self.rectification_gradient_tup[0](sub_unit[j][k].error_delta)
+                    
+    
             
