@@ -14,7 +14,7 @@ class layer():
         self.bias_property=()
         self.sub_units=()
         self.connections=()
-        sigmoid=lambda x:1/(1+math.exp(-x))
+        sigmoid=lambda x:1.0/(1+math.exp(-x))
         sigmoid_gradient= lambda x:sigmoid(x)*(1-sigmoid(x))
         self.rectification_function_tup=(sigmoid,)              # Add as many rectification function as necessary in the tuple.
         self.rectification_gradient_tup=(sigmoid_gradient,)
@@ -62,26 +62,25 @@ class layer():
             #iteration over sub_units of foreward_layer
             for j,unit_connection in enumerate(unit_connection_tup):
                 shape=foreward_layer.sub_units[j].shape
-                if unit_connection=='one_one':
-                    theta_temp=np.random.rand(1,1)
-                    gradient_temp=np.random.rand(1,1)
-                    #print theta_temp
-                    #ErrorCheck
-                    if foreward_layer.sub_units[j].shape != self.sub_units[i].shape:
-                        print ("One to one corespondance is not possible")
-                elif unit_connection=='one_to_all':
-                    theta_temp=np.random.rand(shape[0],shape[1])
-                    gradient_temp=np.random.rand(shape[0],shape[1])
-                    #print theta_temp
-                elif unit_connection=='none':
-                    theta_temp=np.random.rand(0,0)
-                    gradient_temp=np.random.rand(0,0)
                 unit_shape=self.sub_units[i].shape
                 #print unit_shape
                 for k in range(unit_shape[0]):
                     for l in range(unit_shape[1]):
+                        if unit_connection=='one_one':
+                            theta_temp=np.random.rand(1,1)
+                            gradient_temp=np.random.rand(1,1)
+                            #print theta_temp
+                            #ErrorCheck
+                            if foreward_layer.sub_units[j].shape != self.sub_units[i].shape:
+                                print ("One to one corespondance is not possible")
+                        elif unit_connection=='one_to_all':
+                            theta_temp=np.random.rand(shape[0],shape[1])
+                            gradient_temp=np.random.rand(shape[0],shape[1])
+                            #print theta_temp
+                        elif unit_connection=='none':
+                            theta_temp=np.random.rand(0,0)
+                            gradient_temp=np.random.rand(0,0)
                         #print 'Hi K'
-                        theta_temp=theta_temp*np.random.rand()
                         self.sub_units[i][k][l].Theta=self.sub_units[i][k][l].Theta+(theta_temp,)
                         self.sub_units[i][k][l].Gradient=self.sub_units[i][k][l].Gradient+(gradient_temp,)
                         self.sub_units[i][k][l].connection_type=self.sub_units[i][k][l].connection_type+(unit_connection,)
@@ -151,7 +150,14 @@ class layer():
                             for l in range(shape_unit_current[1]):
                                 for m in range(shape_unit_foreward[0]):
                                     for n in range(shape_unit_foreward[1]):
+                                        #print "error_delta: ",foreward_layer.sub_units[j][m][n].error_delta
+                                        #print 'a_val: ',self.sub_units[i][k][l].a_val
+                                        #print 'i,k,l: ',i,k,l
+                                        #print 'j,m,n: ',j,m,n
+                                        #print 'totuk: ',self.sub_units[1][0][0].Gradient
                                         self.sub_units[i][k][l].Gradient[j][m][n]=foreward_layer.sub_units[j][m][n].error_delta*self.sub_units[i][k][l].a_val
+                                        print 'self.sub_units[i][k][l].Gradient[j][m][n]: ',self.sub_units[i][k][l].Gradient[j][m][n]
+                                        print 'totuk: ',self.sub_units[1][0][0].Gradient
                                         self.sub_units[i][k][l].error_delta=self.sub_units[i][k][l].error_delta+foreward_layer.sub_units[j][m][n].error_delta*self.sub_units[i][k][l].Theta[j].item(m,n)
                         
         elif self.layer_type=='input':
@@ -190,6 +196,8 @@ class layer():
                 shape=sub_unit.shape
                 for j in range(shape[0]):
                     for k in range(shape[1]):
+                        #print sub_unit[j][k].a_val
+                        #print ((1-sub_unit[j][k].Y)*math.log(1-sub_unit[j][k].a_val)+(sub_unit[j][k].Y)*math.log(sub_unit[j][k].a_val))
                         self.cost_incurred=self.cost_incurred-((1-sub_unit[j][k].Y)*math.log(1-sub_unit[j][k].a_val)+(sub_unit[j][k].Y)*math.log(sub_unit[j][k].a_val))
         else:
             print "This function is only defined for the output layer. Tin ton tin"
