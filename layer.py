@@ -156,8 +156,10 @@ class layer():
                                         #print 'j,m,n: ',j,m,n
                                         #print 'totuk: ',self.sub_units[1][0][0].Gradient
                                         self.sub_units[i][k][l].Gradient[j][m][n]=foreward_layer.sub_units[j][m][n].error_delta*self.sub_units[i][k][l].a_val
-                                        print 'self.sub_units[i][k][l].Gradient[j][m][n]: ',self.sub_units[i][k][l].Gradient[j][m][n]
-                                        print 'totuk: ',self.sub_units[1][0][0].Gradient
+                                        #print 'self.sub_units[i][k][l].Gradient[j][m][n]: ',self.sub_units[i][k][l].Gradient[j][m][n]
+                                        #print 'totuk: ',self.sub_units[1][0][0].Gradient
+                                        print "ERROR CHECK"
+                                        print "Initial Error delta, Foreward_error_delta, Theta :::",self.sub_units[i][k][l].error_delta,foreward_layer.sub_units[j][m][n].error_delta,self.sub_units[i][k][l].Theta[j].item(m,n)
                                         self.sub_units[i][k][l].error_delta=self.sub_units[i][k][l].error_delta+foreward_layer.sub_units[j][m][n].error_delta*self.sub_units[i][k][l].Theta[j].item(m,n)
                         
         elif self.layer_type=='input':
@@ -187,7 +189,7 @@ class layer():
                 shape=sub_unit.shape
                 for j in range(shape[0]): 
                     for k in range(shape[1]):
-                        sub_unit[j][k].error_delta=self.rectification_gradient_tup[0](sub_unit[j][k].error_delta)
+                        sub_unit[j][k].error_delta=self.rectification_gradient_tup[0](sub_unit[j][k].a_val)*sub_unit[j][k].error_delta
                     
     def cost_calculation(self):
         '''Only valid for output layer'''
