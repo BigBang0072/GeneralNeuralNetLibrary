@@ -1,7 +1,6 @@
 from node import node
 from layer import *
 import numpy as np
-from testC import testC
 
 
 a=layer('input',[(1,1,'biased'),(2,1,'un_biased')])

@@ -30,6 +30,7 @@ class layer():
                 
     
     def initialize_layer(self):
+        ''' Look for the better method for initialization of the layer'''
         for i in range(self.num_of_units):
             shape=self.sub_units[i].shape
             for j in range(shape[0]):
@@ -50,7 +51,7 @@ class layer():
             print ('Error.Give correct number of connection for each subunits of this layer')
         
         # Starting to connect
-        self.connections=tuple(connection_list)
+        self.connections=tuple(connection_list)  #for protection from assignment by mistake by user
         
         #iteration over sub_units of current layer
         for i,unit_connection_tup in enumerate(connection_list):
@@ -64,6 +65,7 @@ class layer():
                 shape=foreward_layer.sub_units[j].shape
                 unit_shape=self.sub_units[i].shape
                 #print unit_shape
+                #Initializing the theta and gradient matrices seperately for each element(inefficient), as shape will be same for all the elements in that subunit's theta for that particular subunit in foreward_layer. But it is created by reference and all the nodes's theta will be essentially same. Think for better way.
                 for k in range(unit_shape[0]):
                     for l in range(unit_shape[1]):
                         if unit_connection=='one_one':
@@ -83,7 +85,7 @@ class layer():
                         #print 'Hi K'
                         self.sub_units[i][k][l].Theta=self.sub_units[i][k][l].Theta+(theta_temp,)
                         self.sub_units[i][k][l].Gradient=self.sub_units[i][k][l].Gradient+(gradient_temp,)
-                        self.sub_units[i][k][l].connection_type=self.sub_units[i][k][l].connection_type+(unit_connection,)
+                        self.sub_units[i][k][l].connection_type=self.sub_units[i][k][l].connection_type+(unit_connection,)#??Why are we keeping this information with the node also as it is available with teh layer in layer's connection tuple.
                 
                       
     # Foreward_propagation of layer to next layer
