@@ -15,8 +15,8 @@ b.create_connection(c,[('one_to_all',),('one_to_all',)])
 A=a.sub_units
 B=b.sub_units
 C=c.sub_units
-A[1][0][0].a_val=1
-A[1][1][0].a_val=1
+A[1][0][0].a_val=2
+A[1][1][0].a_val=3
 C[0][0][0].Y=1
 C[0][1][0].Y=0
 a.layer_foreward_propagate(b)
@@ -42,6 +42,13 @@ print B[0][0][0].Theta
 print B[1][0][0].Theta
 print B[1][1][0].Theta
 
+print "output_val:"
+print C[0][0][0].a_val
+print C[0][1][0].a_val
+print "error_delta"
+print C[0][0][0].error_delta
+print C[0][1][0].error_delta
+
 print A[0][0][0].Gradient
 print A[1][0][0].Gradient
 print A[1][1][0].Gradient
@@ -49,11 +56,6 @@ print B[0][0][0].Gradient
 print B[1][0][0].Gradient
 print B[1][1][0].Gradient
 
-print "output_val:"
-print C[0][0][0].a_val
-print C[0][1][0].a_val
-print "error_delta"
-print C[0][0][0].error_delta
-print C[0][1][0].error_delta
+
 
 

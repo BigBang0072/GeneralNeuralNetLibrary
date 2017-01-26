@@ -189,9 +189,10 @@ class layer():
         if self.layer_type =='hidden':
             for i,sub_unit in enumerate(self.sub_units):
                 shape=sub_unit.shape
-                for j in range(shape[0]): 
-                    for k in range(shape[1]):
-                        sub_unit[j][k].error_delta=self.rectification_gradient_tup[0](sub_unit[j][k].z_val)*sub_unit[j][k].error_delta
+                if self.bias_property[i] == 'un_biased':
+                    for j in range(shape[0]): 
+                        for k in range(shape[1]):
+                            sub_unit[j][k].error_delta=self.rectification_gradient_tup[0](sub_unit[j][k].z_val)*sub_unit[j][k].error_delta
                         
         else:
             print "This function is only valid for hidden layer cuz they have got balls for it to roll."
