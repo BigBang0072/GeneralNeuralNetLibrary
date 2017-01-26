@@ -191,7 +191,10 @@ class layer():
                 shape=sub_unit.shape
                 for j in range(shape[0]): 
                     for k in range(shape[1]):
-                        sub_unit[j][k].error_delta=self.rectification_gradient_tup[0](sub_unit[j][k].a_val)*sub_unit[j][k].error_delta
+                        sub_unit[j][k].error_delta=self.rectification_gradient_tup[0](sub_unit[j][k].z_val)*sub_unit[j][k].error_delta
+                        
+        else:
+            print "This function is only valid for hidden layer cuz they have got balls for it to roll."
                     
     def cost_calculation(self):
         '''Only valid for output layer'''
