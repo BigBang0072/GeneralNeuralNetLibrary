@@ -70,18 +70,18 @@ class layer():
                     for l in range(unit_shape[1]):
                         if unit_connection=='one_one':
                             theta_temp=np.random.rand(1,1)
-                            gradient_temp=np.random.rand(1,1)
+                            gradient_temp=np.zeros((1,1))
                             #print theta_temp
                             #ErrorCheck
                             if foreward_layer.sub_units[j].shape != self.sub_units[i].shape:
                                 print ("One to one corespondance is not possible")
                         elif unit_connection=='one_to_all':
                             theta_temp=np.random.rand(shape[0],shape[1])
-                            gradient_temp=np.random.rand(shape[0],shape[1])
+                            gradient_temp=np.zeros((shape[0],shape[1]))
                             #print theta_temp
                         elif unit_connection=='none':
                             theta_temp=np.random.rand(0,0)
-                            gradient_temp=np.random.rand(0,0)
+                            gradient_temp=np.zeros((0,0))
                         #print 'Hi K'
                         self.sub_units[i][k][l].Theta=self.sub_units[i][k][l].Theta+(theta_temp,)
                         self.sub_units[i][k][l].Gradient=self.sub_units[i][k][l].Gradient+(gradient_temp,)
@@ -134,7 +134,7 @@ class layer():
                 for j in range(shape[0]):
                     for k in range(shape[1]):
                         # Gradient of J(cost function: our standard).For other cost function write your own error_delta. on the output nodes. 
-                        sub_unit[j][k].error_delta=sub_unit[j][k].a_val-sub_unit[j][k].Y
+                        sub_unit[j][k].error_delta=sub_unit[j][k].a_val-sub_unit[j][k].Y #Directly assigned (no need to zero it before running next example, will get erased automatically.)
         elif self.layer_type=='hidden':
             for i,sub_unit_current in enumerate(self.sub_units):
                 unit_connection_tup=self.connections[i]
@@ -145,7 +145,8 @@ class layer():
                     if unit_connection=='one_one':
                         for k in range(shape_unit_current[0]):
                             for l in range(shape_unit_current[1]):
-                                self.sub_units[i][k][l].Gradient[j][0][0]=foreward_layer.sub_units[j][k][l].error_delta*self.sub_units[i][k][l].a_val
+                                # Gradient is initialized to zero at first. And then we will keep adding it till the batch is complete.
+                                self.sub_units[i][k][l].Gradient[j][0][0]=self.sub_units[i][k][l].Gradient[j][0][0]+foreward_layer.sub_units[j][k][l].error_delta*self.sub_units[i][k][l].a_val
                                 self.sub_units[i][k][l].error_delta=self.sub_units[i][k][l].error_delta+(foreward_layer.sub_units[j][k][l].error_delta*self.sub_units[i][k][l].Theta[j][0][0].item(0))
                     elif unit_connection=='one_to_all':
                         for k in range(shape_unit_current[0]):
@@ -157,11 +158,12 @@ class layer():
                                         #print 'i,k,l: ',i,k,l
                                         #print 'j,m,n: ',j,m,n
                                         #print 'totuk: ',self.sub_units[1][0][0].Gradient
-                                        self.sub_units[i][k][l].Gradient[j][m][n]=foreward_layer.sub_units[j][m][n].error_delta*self.sub_units[i][k][l].a_val
+                                        self.sub_units[i][k][l].Gradient[j][m][n]=self.sub_units[i][k][l].Gradient[j][m][n]+foreward_layer.sub_units[j][m][n].error_delta*self.sub_units[i][k][l].a_val
                                         #print 'self.sub_units[i][k][l].Gradient[j][m][n]: ',self.sub_units[i][k][l].Gradient[j][m][n]
                                         #print 'totuk: ',self.sub_units[1][0][0].Gradient
                                         print "ERROR CHECK"
                                         print "Initial Error delta, Foreward_error_delta, Theta :::",self.sub_units[i][k][l].error_delta,foreward_layer.sub_units[j][m][n].error_delta,self.sub_units[i][k][l].Theta[j].item(m,n)
+                                        # Necesssary to have sum on right side of equation (sort of like update) as we have to add all the contribution from foreward layer , So we will have to zero it before before running next epoch, for having new delta with us, for new example.
                                         self.sub_units[i][k][l].error_delta=self.sub_units[i][k][l].error_delta+foreward_layer.sub_units[j][m][n].error_delta*self.sub_units[i][k][l].Theta[j].item(m,n)
                         
         elif self.layer_type=='input':
@@ -174,14 +176,14 @@ class layer():
                     if unit_connection=='one_one':
                         for k in range(shape_unit_current[0]):
                             for l in range(shape_unit_current[1]):
-                                self.sub_units[i][k][l].Gradient[j][0][0]=foreward_layer.sub_units[j][k][l].error_delta*self.sub_units[i][k][l].a_val
+                                self.sub_units[i][k][l].Gradient[j][0][0]=self.sub_units[i][k][l].Gradient[j][0][0]+foreward_layer.sub_units[j][k][l].error_delta*self.sub_units[i][k][l].a_val
                                 #self.sub_units[i][k][l].error_delta=self.sub_units[i][k][l].error_delta+(foreward_layer.sub_units[j][k][l].error_delta*self.sub_units[i][k][l].Theta[j][0][0].item(0))
                     elif unit_connection=='one_to_all':
                         for k in range(shape_unit_current[0]):
                             for l in range(shape_unit_current[1]):
                                 for m in range(shape_unit_foreward[0]):
                                     for n in range(shape_unit_foreward[1]):
-                                        self.sub_units[i][k][l].Gradient[j][m][n]=foreward_layer.sub_units[j][m][n].error_delta*self.sub_units[i][k][l].a_val
+                                        self.sub_units[i][k][l].Gradient[j][m][n]=self.sub_units[i][k][l].Gradient[j][m][n]+foreward_layer.sub_units[j][m][n].error_delta*self.sub_units[i][k][l].a_val
                                         #self.sub_units[i][k][l].error_delta=self.sub_units[i][k][l].error_delta+foreward_layer.sub_units[j][m][n].error_delta*self.sub_units[i][k][l].Theta[j].item(m,n)
           
     def inlayer_back_propagate(self):
