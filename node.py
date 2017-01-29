@@ -35,7 +35,7 @@ class node:
                     self.error_delta=0              # Gradient upto the end of that node(backward)
                 elif biased_flag=='biased':
                     self.a_val=1
-                    self.error_delta=0              # Gradient upto the end of that node(backward)
+                    self.error_delta=0              # Gradient upto the end of that node(backward)(DONT NEED)
         else:
             print("Error.Position not well defined")
             

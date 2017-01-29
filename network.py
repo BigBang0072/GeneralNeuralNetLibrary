@@ -14,21 +14,31 @@ class network():
         self.alpha_rate=float(descent_rate)
         
     
-    def initialize_input_layer(self,file_read_handle):
-    
+    def initialize_input_output_layer(self,file_read_handle):
+        #both X val and Y val for new elemnt of output layer
+        for lines in fhad:
+            initialize()
+        
+        
     #There is no need to create a new network and set the Thetas from previous network. We will just initialize this present network 
     # to the state that just by initializing the input_layer with new batch we can resume our work.
     def initialize_network(self):
         ''' To set the network to initial state to start a fresh epoch cycle by reseting all the variable '''
-        for dummy,layer in enumerate(self.all_layer_tup):
-            
-            if layer.layer_type=='hidden':
-                for i,sub_unit in enumerate(layer.sub_units):
-                    shape_current_unit=sub_unit.shape
-                    for j in range(shape_current_unit[0]):
-                        for k in range(shape_current_unit[1]):
+        for layer in self.all_layer_tup:
+            for i,sub_unit in enumerate(layer.sub_units):
+                shape_current_unit=sub_unit.shape
+                for j in range(shape_current_unit[0]):
+                    for k in range(shape_current_unit[1]):
+                        if layer.layer_type=='hidden':
                             sub_unit[j][k].error_delta=0
-    
+                            if layer.bias_property[i]=='un_biased':
+                                sub_unit[j][k].a_val=0
+                                sub_unit[j][k].z_val=0
+                        elif layer.layer_type=='output':
+                            sub_unit[j][k].error_delta=0
+                            sub_unit[j][k].a_val=0
+                            sub_unit[j][k].z_val=0
+                                                    
            
     def network_foreward_propagate(self):
         for i,layer in enumerate(self.all_layer_tup):
@@ -40,7 +50,7 @@ class network():
             elif layer.layer_type=='output':
                 layer.inlayer_foreward_propagate()
                 
-        #(IMPORTANT) Calculate the cost function and divide by the batch size.(or while implementing) in final script (to full cost as  I have removed the m factor from regularisation part also.)
+        #(IMPORTANT) Calculate the cost function and DONT divide by the batch size.(or while implementing) in final script (to full cost as  I have divided the m factor from regularisation part also.)
                 
     def network_back_propagate(self):
         for i,reversed_layer in enumerate(reversed(self.all_layer_tup)):
@@ -67,7 +77,7 @@ class network():
                                     for l in range(shape_theta[0]):
                                         for m in range(shape_theta[1]):
                                             if layer.bias_property[unit_index] != 'biased':
-                                                output_layer.cost_incurred=output_layer.cost_incurred+((self.lambda_val/(2))*(sub_unit[j][k].Theta[theta_index].item(l,m)**2))
+                                                output_layer.cost_incurred=output_layer.cost_incurred+((self.lambda_val/(2*self.batch_size))*(sub_unit[j][k].Theta[theta_index].item(l,m)**2))
                                                 sub_unit[j][k].Gradient[theta_index][l][k]=sub_unit[j][k].Gradient[theta_index].item(l,m)+((self.lambda_val/self.batch_size)*sub_unit[j][k].Theta[theta_index].item(l,m))
                                             sub_unit[j][k].Theta[theta_index][l][m]=sub_unit[j][k].Theta[theta_index].item(l,m)-((self.alpha_rate)*sub_units[j][k].Gradient[theta_index].item(l,m))
     

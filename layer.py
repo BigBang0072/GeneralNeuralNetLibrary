@@ -3,10 +3,11 @@ from node import node
 import math
 
 class layer():
-    def __init__(self,layer_type,unit_property_list):
+    def __init__(self,layer_type,unit_property_list,batch_size):
         ''' Argument 1: It gives the type of layer it is out of (input,hidden,output)
-            Argument 2: It is a list of dimension of subunits in a layer in form of tuples for each subunit like (number_of rows,number_of_column,'biased or un_biased')'''
-            
+            Argument 2: It is a list of dimension of subunits in a layer in form of tuples for each subunit like (number_of rows,number_of_column,'biased or un_biased')
+            Argument 3: It is the batch size taken at a time to calculate the cost and gradient in chunk(if doing batch) or total example it is going to be stochastic'''
+        self.batch_size=batch_size   
         self.num_of_units=len(unit_property_list)
         self.layer_type=layer_type
         if layer_type=='output':
@@ -134,7 +135,7 @@ class layer():
                 for j in range(shape[0]):
                     for k in range(shape[1]):
                         # Gradient of J(cost function: our standard).For other cost function write your own error_delta. on the output nodes. 
-                        sub_unit[j][k].error_delta=sub_unit[j][k].a_val-sub_unit[j][k].Y #Directly assigned (no need to zero it before running next example, will get erased automatically.)
+                        sub_unit[j][k].error_delta=(sub_unit[j][k].a_val-sub_unit[j][k].Y)/(self.batch_size) #Directly assigned (no need to zero it before running next example, will get erased automatically.)
         elif self.layer_type=='hidden':
             for i,sub_unit_current in enumerate(self.sub_units):
                 unit_connection_tup=self.connections[i]
@@ -208,7 +209,7 @@ class layer():
                     for k in range(shape[1]):
                         #print sub_unit[j][k].a_val
                         #print ((1-sub_unit[j][k].Y)*math.log(1-sub_unit[j][k].a_val)+(sub_unit[j][k].Y)*math.log(sub_unit[j][k].a_val))
-                        self.cost_incurred=self.cost_incurred-((1-sub_unit[j][k].Y)*math.log(1-sub_unit[j][k].a_val)+(sub_unit[j][k].Y)*math.log(sub_unit[j][k].a_val))
+                        self.cost_incurred=self.cost_incurred-(((1-sub_unit[j][k].Y)*math.log(1-sub_unit[j][k].a_val)+(sub_unit[j][k].Y)*math.log(sub_unit[j][k].a_val))/(self.batch_size))
         else:
             print "This function is only defined for the output layer. Tin ton tin"
      
