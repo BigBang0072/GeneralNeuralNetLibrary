@@ -13,11 +13,11 @@ class network():
         self.lambda_val=float(regulariastion_val)
         self.alpha_rate=float(descent_rate)
         
-    
-    def initialize_input_output_layer(self,file_read_handle):
+    #During the final implementation phase where we feed the neural net with our data.
+    #def initialize_input_output_layer(self,file_read_handle):
         #both X val and Y val for new elemnt of output layer
-        for lines in fhad:
-            initialize()
+        #for lines in fhad:
+            #initialize()
         
         
     #There is no need to create a new network and set the Thetas from previous network. We will just initialize this present network 
@@ -53,15 +53,17 @@ class network():
         #(IMPORTANT) Calculate the cost function and DONT divide by the batch size.(or while implementing) in final script (to full cost as  I have divided the m factor from regularisation part also.)
                 
     def network_back_propagate(self):
-        for i,reversed_layer in enumerate(reversed(self.all_layer_tup)):
+        for reversed_layer in reversed(self.all_layer_tup):
             if reversed_layer.layer_type=='output':
                 reversed_layer.layer_back_propagate('none')
             elif reversed_layer.layer_type=='hidden':
-                reversed_layer.layer_back_propagate(self.all_layer_tup[i-1])
+                #print self.all_layer_tup[i+1]
+                reversed_layer.layer_back_propagate(self.all_layer_tup[self.all_layer_tup.index(reversed_layer)+1])
                 reversed_layer.inlayer_back_propagate()
             elif reversed_layer.layer_type=='input':
-                reversed_layer.layer_back_propagate(self.all_layer_tup[i-1])
+                reversed_layer.layer_back_propagate(self.all_layer_tup[self.all_layer_tup.index(reversed_layer)+1])
     
+    ## The regulization term is added here not in network part of gradietnt descent.
     def start_gradient_descent(self):
         num_units=len(self.all_layer_tup)
         output_layer=self.all_layer_tup[num_units-1]
@@ -71,7 +73,7 @@ class network():
                     shape_current_unit=sub_unit.shape
                     for j in range(shape_current_unit[0]):
                         for k in range(shape_current_unit[1]):
-                            for theta_index,theta in enumerate(sub_unit[j][k].Theta)
+                            for theta_index,theta in enumerate(sub_unit[j][k].Theta):
                                 shape_theta=theta.shape
                                 if (shape_theta[0]+shape_theta[1])>0:
                                     for l in range(shape_theta[0]):
@@ -79,6 +81,6 @@ class network():
                                             if layer.bias_property[unit_index] != 'biased':
                                                 output_layer.cost_incurred=output_layer.cost_incurred+((self.lambda_val/(2*self.batch_size))*(sub_unit[j][k].Theta[theta_index].item(l,m)**2))
                                                 sub_unit[j][k].Gradient[theta_index][l][k]=sub_unit[j][k].Gradient[theta_index].item(l,m)+((self.lambda_val/self.batch_size)*sub_unit[j][k].Theta[theta_index].item(l,m))
-                                            sub_unit[j][k].Theta[theta_index][l][m]=sub_unit[j][k].Theta[theta_index].item(l,m)-((self.alpha_rate)*sub_units[j][k].Gradient[theta_index].item(l,m))
+                                            sub_unit[j][k].Theta[theta_index][l][m]=sub_unit[j][k].Theta[theta_index].item(l,m)-((self.alpha_rate)*sub_unit[j][k].Gradient[theta_index].item(l,m))
     
-    def calculate_cost(self):
+    #def calculate_cost(self):
