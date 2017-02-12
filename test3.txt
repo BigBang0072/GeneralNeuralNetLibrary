@@ -1,0 +1,13 @@
+from node import node
+from layer import layer
+import numpy as np
+
+
+a=layer('input',[(1,1,'biased'),(2,1,'un_biased')],1)
+b=layer('hidden',[(1,1,'biased'),(2,1,'un_biased')],1)
+c=layer('output',[(2,1,'un_biased')],1)
+a.initialize_layer()
+b.initialize_layer()
+c.initialize_layer()
+a.create_connection(b,[('none','one_to_all'),('none','one_to_all')])
+b.create_connection(c,[('one_to_all',),('one_to_all',)])

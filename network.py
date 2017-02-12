@@ -14,12 +14,21 @@ class network():
         self.alpha_rate=float(descent_rate)
         
     #During the final implementation phase where we feed the neural net with our data.
-    #def initialize_input_output_layer(self,file_read_handle):
+    def initialize_input_output_layer(self,list_of_input,list_of_output):
         #both X val and Y val for new elemnt of output layer
-        #for lines in fhad:
-            #initialize()
-        
-        
+        for i,sub_unit in enumerate(self.all_layer_tup[0].sub_units):
+            shape_current_unit=sub_unit.shape
+            if self.all_layer_tup[0].bias_property[i]=='un_biased':
+                for j in range(shape_current_unit[0]):
+                    for k in range(shape_current_unit[1]):
+                        sub_unit[j][k].a_val=list_of_input[i][j+k]
+                               
+        for i,sub_unit in enumerate(self.all_layer_tup[-1].sub_units):
+            shape_current_unit=sub_unit.shape
+            for j in range(shape_current_unit[0]):
+                for k in range(shape_current_unit[1]):
+                    sub_unit[j][k].Y=list_of_output[i][j+k]
+                    
     #There is no need to create a new network and set the Thetas from previous network. We will just initialize this present network 
     # to the state that just by initializing the input_layer with new batch we can resume our work.
     def initialize_network(self):
