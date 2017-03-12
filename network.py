@@ -12,26 +12,31 @@ class network():
         self.batch_size=float(batch_size)
         self.lambda_val=float(regulariastion_val)
         self.alpha_rate=float(descent_rate)
-        
+    
+    #MODIFY DURING NEW SETUP(IMPORTANT)
     #During the final implementation phase where we feed the neural net with our data.
     def initialize_input_output_layer(self,list_of_input,list_of_output):
+        ''' In list of input and output: if a subunit is biased then give empty tuple '''
         #both X val and Y val for new elemnt of output layer
         for i,sub_unit in enumerate(self.all_layer_tup[0].sub_units):
             shape_current_unit=sub_unit.shape
             if self.all_layer_tup[0].bias_property[i]=='un_biased':
                 for j in range(shape_current_unit[0]):
                     for k in range(shape_current_unit[1]):
-                        sub_unit[j][k].a_val=list_of_input[i][j+k]
+                        #print len(list_of_input[i]),shape_current_unit[1],j,k
+                        sub_unit[j][k].a_val=list_of_input[i][(shape_current_unit[1])*j+k]
                                
         for i,sub_unit in enumerate(self.all_layer_tup[-1].sub_units):
             shape_current_unit=sub_unit.shape
+            #print shape_current_unit
             for j in range(shape_current_unit[0]):
                 for k in range(shape_current_unit[1]):
-                    sub_unit[j][k].Y=list_of_output[i][j+k]
+                    #print 'i:',i,',j:',j,',k:',k,list_of_output[i][(shape_current_unit[1])*j+k],'\n'
+                    sub_unit[j][k].Y=list_of_output[i][(shape_current_unit[1])*j+k]
                     
     #There is no need to create a new network and set the Thetas from previous network. We will just initialize this present network 
     # to the state that just by initializing the input_layer with new batch we can resume our work.
-    def initialize_network(self):
+    def in_batch_initialize_network(self):
         ''' To set the network to initial state to start a fresh epoch cycle by reseting all the variable '''
         for layer in self.all_layer_tup:
             for i,sub_unit in enumerate(layer.sub_units):
@@ -48,7 +53,26 @@ class network():
                             sub_unit[j][k].a_val=0
                             sub_unit[j][k].z_val=0
                                                     
-           
+    def batch_initialize_network(self):
+        '''We have to re-initialize the "gradient" to zero whenever a new batch is starting 
+                unlike just initialization of network element like error_delta and a_val in input and y_val in oytput and other node val to zero
+                to accomodate the change in example'''
+        for layer in self.all_layer_tup:
+            if layer.layer_type != 'output':
+                for i,sub_unit in enumerate(layer.sub_units):
+                    shape_current_unit=sub_unit.shape
+                    for j in range(shape_current_unit[0]):
+                        for k in range(shape_current_unit[1]):
+                            foreward_subunit_num=len(sub_unit[j][k].Gradient)
+                            for l in range(foreward_subunit_num):
+                                grad_shape=sub_unit[j][k].Gradient[l].shape
+                                if grad_shape!=(0,0):
+                                    for m in range(grad_shape[0]):
+                                        for n in range(grad_shape[1]):
+                                            sub_unit[j][k].Gradient[l][m][n]=0
+            elif layer.layer_type=='output':
+                layer.cost_incurred=0
+                        
     def network_foreward_propagate(self):
         for i,layer in enumerate(self.all_layer_tup):
             if layer.layer_type=='input':

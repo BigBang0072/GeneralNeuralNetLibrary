@@ -164,6 +164,7 @@ class layer():
                                         #print 'totuk: ',self.sub_units[1][0][0].Gradient
                                         #print "ERROR CHECK"
                                         #print "Initial Error delta, Foreward_error_delta, Theta :::",self.sub_units[i][k][l].error_delta,foreward_layer.sub_units[j][m][n].error_delta,self.sub_units[i][k][l].Theta[j].item(m,n)
+                                        
                                         # Necesssary to have sum on right side of equation (sort of like update) as we have to add all the contribution from foreward layer , So we will have to zero it before before running next epoch, for having new delta with us, for new example.
                                         self.sub_units[i][k][l].error_delta=self.sub_units[i][k][l].error_delta+foreward_layer.sub_units[j][m][n].error_delta*self.sub_units[i][k][l].Theta[j].item(m,n)
                         
