@@ -15,10 +15,24 @@ class layer():
         self.bias_property=()
         self.sub_units=()
         self.connections=()
+
+        #Function Definition
+        linear=lambda x:x                                       #can be used for regression
+        linear_gradient=lambda x:1
+
         sigmoid=lambda x:1.0/(1+math.exp(-x))
         sigmoid_gradient= lambda x:sigmoid(x)*(1-sigmoid(x))
-        self.rectification_function_tup=(sigmoid,)              # Add as many rectification function as necessary in the tuple.
-        self.rectification_gradient_tup=(sigmoid_gradient,)
+
+        relu= lambda x:x if x>0 else 0                          #new rectification for classification (its semi-linear)
+        relu_gradient= lambda x:1 if x>0 else 0
+
+
+        #The first one in the tuple will be used for all teh rectification anfd gradient calculation
+        self.rectification_function_tup=(linear,relu,sigmoid)              # Add as many rectification function as necessary in the tuple.
+        self.rectification_gradient_tup=(linear_gradient,relu_gradient,sigmoid_gradient)
+        self.cost_function_tup=() # Try to modulate functions later
+
+
         #print "HI"
         for i,unit_property in enumerate(unit_property_list):
             self.bias_property=self.bias_property+(unit_property[2],)
@@ -65,19 +79,20 @@ class layer():
             for j,unit_connection in enumerate(unit_connection_tup):
                 shape=foreward_layer.sub_units[j].shape
                 unit_shape=self.sub_units[i].shape
+                epsilon=(math.sqrt(6))/(math.sqrt(shape[0]*shape[1]+unit_shape[0]*unit_shape[1]))
                 #print unit_shape
                 #Initializing the theta and gradient matrices seperately for each element(inefficient), as shape will be same for all the elements in that subunit's theta for that particular subunit in foreward_layer. But it is created by reference and all the nodes's theta will be essentially same. Think for better way.
                 for k in range(unit_shape[0]):
                     for l in range(unit_shape[1]):
                         if unit_connection=='one_one':
-                            theta_temp=np.random.rand(1,1)
+                            theta_temp=np.random.rand(1,1)*epsilon*np.random.randint(-1,2,size=(1,1))
                             gradient_temp=np.zeros((1,1))
                             #print theta_temp
                             #ErrorCheck
                             if foreward_layer.sub_units[j].shape != self.sub_units[i].shape:
                                 print ("One to one corespondance is not possible")
                         elif unit_connection=='one_to_all':
-                            theta_temp=np.random.rand(shape[0],shape[1])
+                            theta_temp=np.random.rand(shape[0],shape[1])*epsilon*np.random.randint(-1,2,size=(shape[0],shape[1]))
                             gradient_temp=np.zeros((shape[0],shape[1]))
                             #print theta_temp
                         elif unit_connection=='none':
@@ -201,16 +216,30 @@ class layer():
         else:
             print "This function is only valid for hidden layer cuz they have got balls for it to roll."
                     
-    def cost_calculation(self):
-        '''Only valid for output layer'''
+    def cost_calculation(self,error_type):
+        '''Only valid for output layer
+            Argument1: error_type is type of error function we want to implement eg. squared or logarithmic'''
         if self.layer_type=='output':
+            #print "abhinav00"
             for i,sub_unit in enumerate(self.sub_units):
                 shape=sub_unit.shape
                 for j in range(shape[0]):
                     for k in range(shape[1]):
-                        #print sub_unit[j][k].a_val
-                        #print ((1-sub_unit[j][k].Y)*math.log(1-sub_unit[j][k].a_val)+(sub_unit[j][k].Y)*math.log(sub_unit[j][k].a_val))
-                        self.cost_incurred=self.cost_incurred-(((1-sub_unit[j][k].Y)*math.log(1-sub_unit[j][k].a_val)+(sub_unit[j][k].Y)*math.log(sub_unit[j][k].a_val))/(self.batch_size))
+                        #print "abhinav0"
+                        if error_type=='logarithmic':
+                            #print sub_unit[j][k].a_val
+                            #print ((1-sub_unit[j][k].Y)*math.log(1-sub_unit[j][k].a_val)+(sub_unit[j][k].Y)*math.log(sub_unit[j][k].a_val))
+                            try:
+                                self.cost_incurred=self.cost_incurred-(((1-sub_unit[j][k].Y)*math.log(1-sub_unit[j][k].a_val)+(sub_unit[j][k].Y)*math.log(sub_unit[j][k].a_val))/(self.batch_size))
+                            except:
+                                #reconsider later (IMPORTANT)
+                                print type(self.cost_incurred)
+                                self.cost_incurred=self.cost_incurred-(-743.7469247408213)
+                        elif error_type=='squared':
+                            #print "abhinav"
+                            #print type(sub_unit[j][k].Y)
+                            #print type(sub_unit[i][k].a_val)
+                            self.cost_incurred=self.cost_incurred+(((sub_unit[j][k].Y)-(sub_unit[j][k].a_val))*((sub_unit[j][k].Y)-(sub_unit[j][k].a_val)))/(2*self.batch_size)
         else:
             print "This function is only defined for the output layer. Tin ton tin"
      

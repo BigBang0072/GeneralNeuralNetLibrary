@@ -13,7 +13,7 @@ class network():
         self.lambda_val=float(regulariastion_val)
         self.alpha_rate=float(descent_rate)
     
-    #MODIFY DURING NEW SETUP(IMPORTANT)
+    # MODIFY DURING NEW SETUP(IMPORTANT)
     #During the final implementation phase where we feed the neural net with our data.
     def initialize_input_output_layer(self,list_of_input,list_of_output):
         ''' In list of input and output: if a subunit is biased then give empty tuple '''
@@ -24,6 +24,7 @@ class network():
                 for j in range(shape_current_unit[0]):
                     for k in range(shape_current_unit[1]):
                         #print len(list_of_input[i]),shape_current_unit[1],j,k
+                        #print (shape_current_unit[1])*j+k
                         sub_unit[j][k].a_val=list_of_input[i][(shape_current_unit[1])*j+k]
                                
         for i,sub_unit in enumerate(self.all_layer_tup[-1].sub_units):
@@ -31,6 +32,7 @@ class network():
             #print shape_current_unit
             for j in range(shape_current_unit[0]):
                 for k in range(shape_current_unit[1]):
+                    #print list_of_output[i]
                     #print 'i:',i,',j:',j,',k:',k,list_of_output[i][(shape_current_unit[1])*j+k],'\n'
                     sub_unit[j][k].Y=list_of_output[i][(shape_current_unit[1])*j+k]
                     
@@ -75,6 +77,7 @@ class network():
                         
     def network_foreward_propagate(self):
         for i,layer in enumerate(self.all_layer_tup):
+            #print i,len(self.all_layer_tup),self.all_layer_tup[i+1]
             if layer.layer_type=='input':
                 layer.layer_foreward_propagate(self.all_layer_tup[i+1])
             elif layer.layer_type=='hidden':
@@ -101,8 +104,10 @@ class network():
         num_units=len(self.all_layer_tup)
         output_layer=self.all_layer_tup[num_units-1]
         for i,layer in enumerate(self.all_layer_tup):
+            #print i
             if layer.layer_type != 'output':
                 for unit_index,sub_unit in enumerate(layer.sub_units):
+                    #print unit_index
                     shape_current_unit=sub_unit.shape
                     for j in range(shape_current_unit[0]):
                         for k in range(shape_current_unit[1]):
@@ -112,8 +117,11 @@ class network():
                                     for l in range(shape_theta[0]):
                                         for m in range(shape_theta[1]):
                                             if layer.bias_property[unit_index] != 'biased':
-                                                output_layer.cost_incurred=output_layer.cost_incurred+((self.lambda_val/(2*self.batch_size))*(sub_unit[j][k].Theta[theta_index].item(l,m)**2))
-                                                sub_unit[j][k].Gradient[theta_index][l][k]=sub_unit[j][k].Gradient[theta_index].item(l,m)+((self.lambda_val/self.batch_size)*sub_unit[j][k].Theta[theta_index].item(l,m))
+                                                #Adding the regularisation Cost to the net cost
+                                                #print ((self.lambda_val/(2*self.batch_size))*(sub_unit[j][k].Theta[theta_index].item(l,m)**2))
+                                                output_layer.cost_incurred=output_layer.cost_incurred+((self.lambda_val/(2*self.batch_size))*(sub_unit[j][k].Theta[theta_index].item(l,m)*sub_unit[j][k].Theta[theta_index].item(l,m)))
+                                                #print i,unit_index,j,k,l,m
+                                                sub_unit[j][k].Gradient[theta_index][l][m]=sub_unit[j][k].Gradient[theta_index].item(l,m)+((self.lambda_val/self.batch_size)*sub_unit[j][k].Theta[theta_index].item(l,m))
                                             sub_unit[j][k].Theta[theta_index][l][m]=sub_unit[j][k].Theta[theta_index].item(l,m)-((self.alpha_rate)*sub_unit[j][k].Gradient[theta_index].item(l,m))
     
     #def calculate_cost(self):

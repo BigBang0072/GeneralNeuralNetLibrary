@@ -1,2 +1,0 @@
-dont take batch size in Metwork initialization or cross check from all the layer if the the batch size is same in all the layers of network.
-Fixe few bugs in network back propagation indexing problem for input of foreward layer to backpropagate current layer.
